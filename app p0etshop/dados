@@ -1,0 +1,106 @@
+### **Estrutura do Banco de Dados (MySQL)**
+
+Tabela: pets
+sql
+CREATE TABLE pets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    species VARCHAR(50) NOT NULL,
+    breed VARCHAR(50),
+    age INT,
+    owner_id INT,
+    FOREIGN KEY (owner_id) REFERENCES owners(id)
+);
+
+
+Tabela: owners
+sql
+CREATE TABLE owners (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    phone VARCHAR(15),
+    email VARCHAR(100),
+    address TEXT
+);
+
+
+#### **Tabela: `services`**
+sql
+CREATE TABLE services (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL
+);
+
+
+#### **Tabela: `appointments`**
+sql
+CREATE TABLE appointments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pet_id INT,
+    service_id INT,
+    appointment_date DATETIME,
+    status ENUM('scheduled', 'completed', 'cancelled') DEFAULT 'scheduled',
+    FOREIGN KEY (pet_id) REFERENCES pets(id),
+    FOREIGN KEY (service_id) REFERENCES services(id)
+);
+
+
+### **Exemplo de Dados (INSERT)**
+
+#### **Inserindo Donos**
+sql
+INSERT INTO owners (name, phone, email, address) VALUES
+('Ana Silva', '11987654321', 'ana.silva@example.com', 'Rua das Flores, 123'),
+('Carlos Santos', '11912345678', 'carlos.santos@example.com', 'Av. Paulista, 456');
+
+
+#### **Inserindo Pets**
+sql
+INSERT INTO pets (name, species, breed, age, owner_id) VALUES
+('Rex', 'Cachorro', 'Labrador', 3, 1),
+('Mia', 'Gato', 'Siamês', 2, 2),
+('Bidu', 'Cachorro', 'Poodle', 5, 1);
+
+
+#### **Inserindo Serviços**
+sql
+INSERT INTO services (name, description, price) VALUES
+('Banho e Tosa', 'Serviço completo de banho e tosa.', 50.00),
+('Vacinação', 'Aplicação de vacinas essenciais.', 80.00),
+('Consulta Veterinária', 'Consulta com veterinário especializado.', 120.00);
+
+
+#### **Inserindo Agendamentos**
+sql
+INSERT INTO appointments (pet_id, service_id, appointment_date, status) VALUES
+(1, 1, '2025-01-25 10:00:00', 'scheduled'),
+(2, 2, '2025-01-26 14:00:00', 'scheduled'),
+(3, 3, '2025-01-27 09:00:00', 'completed');
+
+
+---
+
+### **Descrição das Tabelas**
+1. **`owners`**: Armazena informações sobre os donos dos pets.
+2. **`pets`**: Armazena dados sobre os pets, como espécie, raça e idade.
+3. **`services`**: Lista os serviços oferecidos pelo petshop, com descrição e preços.
+4. **`appointments`**: Registra agendamentos dos serviços para os pets.
+
+### **Exemplo de Consulta**
+- Listar os pets com os respectivos donos:
+```
+sql
+SELECT pets.name AS Pet, pets.species, owners.name AS Owner, owners.phone
+FROM pets
+JOIN owners ON pets.owner_id = owners.id;
+```
+
+- Listar agendamentos futuros:
+```sql
+SELECT appointments.id, pets.name AS Pet, services.name AS Service, appointments.appointment_date
+FROM appointments
+JOIN pets ON appointments.pet_id = pets.id
+JOIN services ON appointments.service_id = services.id
+WHERE appointments.status = 'scheduled';
